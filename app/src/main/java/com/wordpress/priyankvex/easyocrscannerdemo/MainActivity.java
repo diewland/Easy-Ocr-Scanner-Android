@@ -3,16 +3,25 @@ package com.wordpress.priyankvex.easyocrscannerdemo;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements EasyOcrScannerListener{
 
     EasyOcrScanner mEasyOcrScanner;
-    TextView textView;
+    ListView lv;
+    ArrayAdapter<String> adapter;
     ProgressDialog mProgressDialog;
 
     @Override
@@ -20,7 +29,16 @@ public class MainActivity extends AppCompatActivity implements EasyOcrScannerLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        textView = (TextView) findViewById(R.id.textView);
+        lv = (ListView) findViewById(R.id.listView);
+        lv.setBackgroundColor(Color.DKGRAY);
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String s = ((TextView) view).getText().toString();
+                Intent intent = new Intent(Intent.ACTION_DIAL);
+                intent.setData(Uri.parse("tel:"+s));
+                startActivity(intent);
+            }
+        });
 
         // initialize EasyOcrScanner instance.
         mEasyOcrScanner = new EasyOcrScanner(MainActivity.this, "EasyOcrScanner",
@@ -67,7 +85,19 @@ public class MainActivity extends AppCompatActivity implements EasyOcrScannerLis
      */
     @Override
     public void onOcrScanFinished(Bitmap bitmap, String recognizedText) {
-        textView.setText(recognizedText);
+
+        String digitOnly = recognizedText.replaceAll("[^\\d\\n]", "");
+        String[] digits = digitOnly.split("\\n");
+        List<String> items = new ArrayList<String>();
+        for(String s : digits) {
+            if(s != null && s.length() >= 6) { // found 6+ digits
+                items.add(s);
+            }
+        }
+        adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, items);
+        lv.setAdapter(null);
+        lv.setAdapter(adapter);
+
         if (mProgressDialog.isShowing()){
             mProgressDialog.dismiss();
         }
