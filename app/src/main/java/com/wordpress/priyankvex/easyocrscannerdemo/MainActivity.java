@@ -12,7 +12,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,7 +66,20 @@ public class MainActivity extends AppCompatActivity implements EasyOcrScannerLis
         super.onActivityResult(requestCode, resultCode, data);
         // Call onImageTaken() in onActivityResult.
         if (resultCode == RESULT_OK && requestCode == Config.REQUEST_CODE_CAPTURE_IMAGE){
-            mEasyOcrScanner.onImageTaken();
+            // after get capture image, call crop intent
+            CropImage.activity(Uri.fromFile(new File(mEasyOcrScanner.filePathOriginal)))
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .start(this);
+        }
+        else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                mEasyOcrScanner.filePathOriginal = result.getUri().getPath();
+                mEasyOcrScanner.onImageTaken();
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+                Toast.makeText(this, error.toString(), Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -90,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements EasyOcrScannerLis
         String[] digits = digitOnly.split("\\n");
         List<String> items = new ArrayList<String>();
         for(String s : digits) {
-            if(s != null && s.length() >= 6) { // found 6+ digits
+            if(s != null) {
                 items.add(s);
             }
         }

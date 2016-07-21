@@ -17,7 +17,7 @@ public class EasyOcrScanner {
 
     protected Activity mActivity;
     private String directoryPathOriginal;
-    private String filePathOriginal;
+    public String filePathOriginal;
     private int requestCode;
     private EasyOcrScannerListener mOcrScannerListener;
     private String trainedDataCode;

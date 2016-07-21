@@ -1,11 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "22.0.1"
-
+    compileSdkVersion 23
+    buildToolsVersion '23.0.3'
     defaultConfig {
-        applicationId "com.wordpress.priyankvex.easyocrscanner"
+        applicationId 'com.diewland.poster.call'
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 1
@@ -17,10 +16,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    productFlavors {
+    }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:22.2.1'
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.android.support:appcompat-v7:23.2.1'
     compile project(':easy_ocr_library')
+    compile 'com.theartofdev.edmodo:android-image-cropper:2.2.+'
 }
